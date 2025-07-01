@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduMalayalam</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --success: #10b981;
+      --success-hover: #059669;
+      --bg-dark: #111827;
+      --bg-card: #1f2937;
+      --text-light: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border-radius: 12px;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-light);
+      padding: 20px;
+    }
+    
+    .container {
+      display: flex;
+      width: 90%;
+      max-width: 1200px;
+      height: 85vh;
+      background: rgba(31, 41, 55, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar {
+      width: 250px;
+      background-color: rgba(17, 24, 39, 0.8);
+      padding: 20px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .sidebar h2 {
+      font-size: 18px;
+      font-weight: 600;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      max-height: calc(85vh - 120px);
+    }
+    
+    .history-item {
+      font-size: 14px;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    
+    .history-item:hover {
+      background-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .app-title {
+      font-size: 24px;
+      font-weight: 700;
+      padding: 20px;
+      text-align: center;
+      color: var(--text-light);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .app-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 0;
+    }
+    
+    .app-logo {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-light);
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, #6366f1, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+    }
+    
+    .app-subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+    
+    .subject-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 20px auto;
+      max-width: 450px;
+      padding: 0 20px;
+    }
+    
+    .subject-button {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-light);
+      padding: 16px 20px;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .subject-button:hover {
+      background: var(--primary);
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+    }
+    
+    .subject-icon {
+      font-size: 24px;
+    }
+    
+    .chat-interface {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .message {
+      max-width: 85%;
+      padding: 14px 18px;
+      border-radius: 18px;
+      line-height: 1.5;
+      font-size: 15px;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .user-message {
+      background: var(--primary);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .bot-message {
+      background: var(--bg-card);
+      color: var(--text-light);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    
+    .bot-message ul, .bot-message ol {
+      padding-left: 20px;
+      margin: 10px 0;
+    }
+    
+    .bot-message h3, .bot-message h4 {
+      margin: 12px 0 8px;
+      color: #d1d5db;
+    }
+    
+    .bot-message p {
+      margin-bottom: 10px;
+    }
+    
+    .bot-message blockquote {
+      border-left: 3px solid var(--primary);
+      padding-left: 10px;
+      margin: 10px 0;
+      font-style: italic;
+      color: #d1d5db;
+    }
+    
+    .message-time {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 6px;
+      text-align: right;
+    }
+    
+    .welcome-message {
+      text-align: center;
+      margin: 40px 0;
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    
+    .input-area {
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(17, 24, 39, 0.8);
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
+    }
+    
+    .file-attachment {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .file-button {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .file-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-light);
+    }
+    
+    .file-button input {
+      display: none;
+    }
+    
+    .file-name {
+      font-size: 14px;
+      color: var(--primary);
+      padding: 6px 12px;
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 6px;
+      max-width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: none;
+    }
+    
+    .upload-button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: none;
+    }
+    
+    .upload-button:hover {
+      background: var(--primary-dark);
+    }
+    
+    .message-input-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 8px 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      min-height: 60px;
+    }
+    
+    .message-input-container:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+    
+    .message-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      font-size: 16px;
+      padding: 12px 5px;
+      resize: none;
+      min-height: 24px;
+      max-height: 150px;
+      overflow-y: auto;
+      line-height: 1.5;
+      width: 100%;
+    }
+    
+    .message-input:focus {
+      outline: none;
+    }
+    
+    .send-button {
+      background-color: var(--success);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+      flex-shrink: 0;
+    }
+    
+    .send-button:hover {
+      background-color: var(--success-hover);
+      transform: scale(1.05);
+    }
+    
+    .back-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: var(--text-light);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s ease;
+      margin: 20px 0 0 20px;
+      width: fit-content;
+    }
+    
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .loading-indicator {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 18px;
+      background: var(--bg-card);
+      border-radius: 18px;
+      max-width: 85%;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      animation: pulse 1.5s infinite;
+    }
+    
+    .loading-dots {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--text-light);
+      border-radius: 50%;
+      animation: dot-animation 1.5s infinite;
+    }
+    
+    .dot:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+    
+    .dot:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+    
+    @keyframes dot-animation {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    
+    @media (max-width: 960px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+        min-height: 85vh;
+      }
+      
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .message-input-container {
+        flex-direction: row;
+        border-radius: 12px;
+        padding: 10px;
+      }
+      
+      .message-input {
+        width: calc(100% - 60px);
+        padding: 10px 0;
+      }
+      
+      .send-button {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar" style="display: none;">
+      <h2><span>📚</span> വിഷയം</h2>
+      <div class="history-list">
+        <div class="history-item" onclick="selectSubject('ജീവശാസ്ത്രം')">
+          <span class="subject-icon">🧬</span> ജീവശാസ്ത്രം
+        </div>
+        <div class="history-item" onclick="selectSubject('സാമൂഹിക ശാസ്ത്രം')">
+          <span class="subject-icon">🌍</span> സാമൂഹിക ശാസ്ത്രം
+        </div>
+        <div class="history-item" onclick="selectSubject('ഭൗതികശാസ്ത്രം')">
+          <span class="subject-icon">⚛️</span> ഭൗതികശാസ്ത്രം
+        </div>
+        <div class="history-item" onclick="selectSubject('രസതന്ത്രം')">
+          <span class="subject-icon">🧪</span> രസതന്ത്രം
+        </div>
+      </div>
+      
+      <h2 style="margin-top: 20px;"><span>📜</span> ചരിത്രം</h2>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+    <div class="main-content">
+      <!-- App Header with Title -->
+      <div class="app-header">
+        <h1 class="app-logo">EduMalayalam</h1>
+        <p class="app-subtitle">മലയാളത്തിലെ വിദ്യാഭ്യാസ ആപ്ലിക്കേഷൻ</p>
+      </div>
+      
+      <h2 class="app-title" id="selected-subject">വിഷയം തിരഞ്ഞെടുക്കുക</h2>
+
+      <!-- Subject Selection Screen - Now Vertical Layout -->
+      <div class="subject-buttons">
+        <button class="subject-button" onclick="selectSubject('ജീവശാസ്ത്രം')">
+          <span class="subject-icon">🧬</span>
+          ജീവശാസ്ത്രം
+        </button>
+        <button class="subject-button" onclick="selectSubject('സാമൂഹിക ശാസ്ത്രം')">
+          <span class="subject-icon">🌍</span>
+          സാമൂഹിക ശാസ്ത്രം
+        </button>
+        <button class="subject-button" onclick="selectSubject('ഭൗതികശാസ്ത്രം')">
+          <span class="subject-icon">⚛️</span>
+          ഭൗതികശാസ്ത്രം
+        </button>
+        <button class="subject-button" onclick="selectSubject('രസതന്ത്രം')">
+          <span class="subject-icon">🧪</span>
+          രസതന്ത്രം
+        </button>
+      </div>
+
+      <!-- Chat Interface -->
+      <div class="chat-interface" id="chatInterface">
+        <button class="back-button" onclick="goBack()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back
+        </button>
+        
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+              <p>നിങ്ങളുടെ <span id="welcomeSubject"></span> ചോദ്യങ്ങൾ ചോദിക്കാൻ തുടങ്ങുക.</p>
+              <p>നിങ്ങൾക്ക് PDF അപ്‌ലോഡ് ചെയ്യാനും ചോദ്യങ്ങൾ ചോദിക്കാനും കഴിയും.</p>
+            </div>
+          </div>
+          
+          <div class="input-area">
+            <div class="file-attachment">
+              <label class="file-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"></path>
+                </svg>
+                PDF അപ്‌ലോഡ്
+                <input type="file" id="fileInput" accept=".pdf" onchange="showFileName()">
+              </label>
+              <span class="file-name" id="fileName"></span>
+              <button class="upload-button" id="uploadButton" onclick="uploadPDF()">അപ്‌ലോഡ് ചെയ്യുക</button>
+            </div>
+            
+            <div class="message-input-container">
+              <textarea class="message-input" id="userQuery" placeholder="നിങ്ങളുടെ ചോദ്യം ഇവിടെ ടൈപ്പ് ചെയ്യുക..." rows="1" oninput="adjustTextareaHeight(this)"></textarea>
+              <button class="send-button" onclick="sendMessage()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let historyQueue = [];
+    let currentSubject = '';
+
+    function selectSubject(subject) {
+      currentSubject = subject;
+      document.getElementById('selected-subject').innerText = subject;
+      document.getElementById('welcomeSubject').innerText = subject;
+      document.querySelector('.subject-buttons').style.display = 'none';
+      document.getElementById('chatInterface').style.display = 'flex';
+      document.getElementById('sidebar').style.display = 'flex';
+      document.querySelector('.app-header').style.display = 'none';
+    }
+
+    function goBack() {
+      document.getElementById('selected-subject').innerText = 'വിഷയം തിരഞ്ഞെടുക്കുക';
+      document.querySelector('.subject-buttons').style.display = 'flex';
+      document.getElementById('chatInterface').style.display = 'none';
+      document.getElementById('sidebar').style.display = 'none';
+      document.querySelector('.app-header').style.display = 'flex';
+      document.getElementById('userQuery').value = '';
+      document.getElementById('fileName').style.display = 'none';
+      document.getElementById('fileInput').value = '';
+      document.getElementById('uploadButton').style.display = 'none';
+      
+      // Clear chat messages except welcome message
+      const chatMessages = document.getElementById('chatMessages');
+      chatMessages.innerHTML = `
+        <div class="welcome-message">
+          <p>നിങ്ങളുടെ <span id="welcomeSubject"></span> ചോദ്യങ്ങൾ ചോദിക്കാൻ തുടങ്ങുക.</p>
+          <p>നിങ്ങൾക്ക് PDF അപ്‌ലോഡ് ചെയ്യാനും ചോദ്യങ്ങൾ ചോദിക്കാനും കഴിയും.</p>
+        </div>
+      `;
+    }
+
+    function showFileName() {
+      const fileInput = document.getElementById('fileInput').files[0];
+      if (fileInput) {
+        document.getElementById('fileName').innerText = fileInput.name;
+        document.getElementById('fileName').style.display = 'block';
+        document.getElementById('uploadButton').style.display = 'block';
+      }
+    }
+
+    function adjustTextareaHeight(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+    }
+
+    function getCurrentTime() {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Function to format bot responses with structure
+    function formatBotResponse(text) {
+      // Format headers
+      text = text.replace(/^(#+)\s+(.+)$/gm, function(match, hashes, title) {
+        const level = hashes.length;
+        return `<h${level+2}>${title}</h${level+2}>`;
+      });
+      
+      // Format lists
+      text = text.replace(/^(\s*)-\s+(.+)$/gm, '<li>$2</li>');
+      text = text.replace(/(<li>.+<\/li>\n)+/g, '<ul>$&</ul>');
+      
+      // Format numbered lists
+      text = text.replace(/^(\s*)\d+\.\s+(.+)$/gm, '<li>$2</li>');
+      text = text.replace(/(<li>.+<\/li>\n)+/g, '<ol>$&</ol>');
+      
+      // Format paragraphs
+      text = text.replace(/^(?!\s*<[uo]l>|<li>|<h\d>)(.+)$/gm, '<p>$1</p>');
+      
+      // Format blockquotes
+      text = text.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
+      
+      return text;
+    }
+
+    function sendMessage() {
+      const userQuery = document.getElementById('userQuery').value.trim();
+      if (!userQuery) {
+        alert('⚠️ ദയവായി ചോദ്യമൊരുക്കുക!');
+        return;
+      }
+
+      addToHistory(userQuery);
+      
+      // Add user message to chat
+      const chatMessages = document.getElementById('chatMessages');
+      const userMessageElement = document.createElement('div');
+      userMessageElement.classList.add('message', 'user-message');
+      userMessageElement.innerHTML = `
+        ${userQuery}
+        <div class="message-time">${getCurrentTime()}</div>
+      `;
+      chatMessages.appendChild(userMessageElement);
+      
+      // Add loading indicator
+      const loadingIndicator = document.createElement('div');
+      loadingIndicator.classList.add('loading-indicator');
+      loadingIndicator.style.display = 'flex';
+      loadingIndicator.innerHTML = `
+        <span>ഉത്തരം തയ്യാറാക്കുന്നു</span>
+        <div class="loading-dots">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      `;
+      chatMessages.appendChild(loadingIndicator);
+      
+      // Scroll to bottom
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+      // Clear input but maintain focus
+      document.getElementById('userQuery').value = '';
+      document.getElementById('userQuery').style.height = 'auto';
+      document.getElementById('userQuery').style.height = '24px';
+      document.getElementById('userQuery').focus();
+
+      // Ensure the input area is visible
+      document.querySelector('.input-area').style.display = 'block';
+
+      // Make API call to backend
+      fetch('http://127.0.0.1:8000/ask_question/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ query: userQuery })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Remove loading indicator
+        chatMessages.removeChild(loadingIndicator);
+        
+        // Add bot response
+        const botMessageElement = document.createElement('div');
+        botMessageElement.classList.add('message', 'bot-message');
+        botMessageElement.innerHTML = `
+          ${formatBotResponse(data.answer)}
+          <div class="message-time">${getCurrentTime()}</div>
+        `;
+        chatMessages.appendChild(botMessageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Make sure the input area remains visible and focused
+        document.querySelector('.input-area').style.display = 'block';
+        document.getElementById('userQuery').focus();
+        
+        // Reset input box height and ensure it's visible
+        setTimeout(() => {
+          adjustTextareaHeight(document.getElementById('userQuery'));
+        }, 100);
+      })
+      .catch(error => {
+        // Remove loading indicator
+        chatMessages.removeChild(loadingIndicator);
+        
+        const botMessageElement = document.createElement('div');
+        botMessageElement.classList.add('message', 'bot-message');
+        botMessageElement.innerHTML = `
+          <p>ക്ഷമിക്കണം, എന്തോ പിശക് സംഭവിച്ചു. ദയവായി വീണ്ടും ശ്രമിക്കുക.</p>
+          <div class="message-time">${getCurrentTime()}</div>
+        `;
+        chatMessages.appendChild(botMessageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Make sure the input area remains visible and focused
+        document.querySelector('.input-area').style.display = 'block';
+        document.getElementById('userQuery').focus();
+      });
+    }
+
+    // Function to handle PDF uploads
+    function uploadPDF() {
+      const fileInput = document.getElementById('fileInput').files[0];
+      if (!fileInput) {
+        alert('⚠️ ദയവായി PDF ഫയൽ തിരഞ്ഞെടുക്കുക!');
+        return;
+      }
+
+      // Create a form data object
+      const formData = new FormData();
+      formData.append('file', fileInput);
+
+      // Show loading indicator
+      const chatMessages = document.getElementById('chatMessages');
+      const loadingIndicator = document.createElement('div');
+      loadingIndicator.classList.add('loading-indicator');
+      loadingIndicator.style.display = 'flex';
+      loadingIndicator.innerHTML = `
+        <span>PDF അപ്‌ലോഡ് ചെയ്യുന്നു</span>
+        <div class="loading-dots">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      `;
+      chatMessages.appendChild(loadingIndicator);
+
+      // Make API call to upload PDF
+      fetch('http://127.0.0.1:8000/upload_pdf/', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Remove loading indicator
+        chatMessages.removeChild(loadingIndicator);
+        
+        // Add confirmation message
+        const botMessageElement = document.createElement('div');
+        botMessageElement.classList.add('message', 'bot-message');
+        botMessageElement.innerHTML = `
+          <p>PDF വിജയകരമായി അപ്‌ലോഡ് ചെയ്തു. നിങ്ങൾക്ക് ഇപ്പോൾ പി.ഡി.എഫിനെക്കുറിച്ച് ചോദ്യങ്ങൾ ചോദിക്കാം.</p>
+          <div class="message-time">${getCurrentTime()}</div>
+        `;
+        chatMessages.appendChild(botMessageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Reset file input and related UI
+        document.getElementById('fileName').style.display = 'none';
+        document.getElementById('fileInput').value = '';
+        document.getElementById('uploadButton').style.display = 'none';
+      })
+      .catch(error => {
+        // Remove loading indicator
+        chatMessages.removeChild(loadingIndicator);
+        
+        // Show error message
+        const botMessageElement = document.createElement('div');
+        botMessageElement.classList.add('message', 'bot-message');
+        botMessageElement.innerHTML = `
+          <p>ക്ഷമിക്കണം, PDF അപ്‌ലോഡ് ചെയ്യുന്നതിൽ പിശക് സംഭവിച്ചു. ദയവായി വീണ്ടും ശ്രമിക്കുക.</p>
+          <div class="message-time">${getCurrentTime()}</div>
+        `;
+        chatMessages.appendChild(botMessageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      });
+    }
+
+    // Function to add queries to history
+    function addToHistory(query) {
+      if (query && currentSubject) {
+        // Add to beginning of queue
+        historyQueue.unshift({
+          subject: currentSubject,
+          query: query,
+          timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        });
+        
+        // Keep only the last 10 items
+        if (historyQueue.length > 10) {
+          historyQueue.pop();
+        }
+        
+        // Update history UI
+        updateHistoryUI();
+      }
+    }
+
+    // Function to update history UI
+    function updateHistoryUI() {
+      const historyList = document.getElementById('historyList');
+      historyList.innerHTML = '';
+      
+      historyQueue.forEach((item, index) => {
+        const historyItem = document.createElement('div');
+        historyItem.classList.add('history-item');
+        historyItem.innerHTML = `
+          <small>${item.timestamp}</small>
+          <div>${item.query}</div>
+        `;
+        historyItem.onclick = function() {
+          selectSubject(item.subject);
+          document.getElementById('userQuery').value = item.query;
+          adjustTextareaHeight(document.getElementById('userQuery'));
+        };
+        
+        historyList.appendChild(historyItem);
+      });
+    }
+
+    // Event listener for Enter key in textarea
+    document.getElementById('userQuery').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Initialize the app
+    window.onload = function() {
+      // Any initialization code here
+    };
+  </script>
+</body>
+</html>
